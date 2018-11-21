@@ -1,9 +1,12 @@
 import sys
-import modules.file_manager as fm
-import modules.process_manager as pm
+from modules.dispatcher import Dispatcher
+
+def main():
+    if len(sys.argv) != 3:
+        print("Execute o programa da seguinte forma: python main.py <processes.txt> <files.txt>")
+
+    dispatcher = Dispatcher()
+    dispatcher.run()
 
 if __name__ == "__main__":
-    processManager = pm.ProcessManager()
-    fileManager = fm.FileManager()
-
-    print()
+    main()
