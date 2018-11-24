@@ -39,13 +39,14 @@ class FileManager:
     def run_op(self, process):
         operation = None
 
+        print("\nSistema de arquivos => ")
+
+        # Find the next operation for the current running process
         for op in self.operations:
             if op.ID_Processo == process.PID:
                 operation = op
                 self.operations.remove(op)
                 break
-
-        print("Processo " + str(process.PID) + " op no arquivo " + str(operation.Nome_arquivo))
 
         if operation is not None:
             if operation.Codigo_Operacao == 0:
@@ -53,28 +54,38 @@ class FileManager:
             else:
                 self.delete_file(process, operation)
         else:
-            print("Error")
-            # TODO error message
+            print("\tNão foi encontrada nenhuma operação para o processo " + str(process.PID))
 
-        process.tempo_de_processador -= 1
 
     def create_file(self, process, operation):
         first_bock_fit = None
 
-        for i in range(len(self.disk) - operation.se_operacaoCriar_numero_blocos):
-            if all(b is None for b in self.disk[i: i + operation.se_operacaoCriar_numero_blocos]):
-                first_bock_fit = i
+        # Check if file already exists
+        if operation.Nome_arquivo not in self.disk:
+            # Search the first continuous segment that can store the file
+            for i in range(len(self.disk) - operation.se_operacaoCriar_numero_blocos):
+                if all(b is None for b in self.disk[i: i + operation.se_operacaoCriar_numero_blocos]):
+                    first_bock_fit = i
 
-        if first_bock_fit is not None:
-            self.disk[first_bock_fit: first_bock_fit + operation.se_operacaoCriar_numero_blocos] = [operation.Nome_arquivo] * operation.se_operacaoCriar_numero_blocos
-            process.created_files.append(operation.Nome_arquivo)
+            if first_bock_fit is not None:
+                self.disk[first_bock_fit: first_bock_fit + operation.se_operacaoCriar_numero_blocos] =\
+                    [operation.Nome_arquivo] * operation.se_operacaoCriar_numero_blocos
+
+                process.created_files.append(operation.Nome_arquivo)
+
+                blocks_str = ', '.join(str(x) for x in list(range(first_bock_fit, first_bock_fit + operation.se_operacaoCriar_numero_blocos)))
+                print("\tSucesso: O processo " + str(process.PID) + " criou o arquivo " + operation.Nome_arquivo +
+                      " (blocos " + blocks_str + ")")
+            else:
+                print("\tFalha: O processo " + str(process.PID) + " não pode criar o arquivo " + operation.Nome_arquivo +
+                      " (falta de espaço)")
         else:
-            print("Não cabe no disco")
-            # TODO error message
+            print("\tFalha: O processo " + str(process.PID) + " não pode criar o arquivo " + operation.Nome_arquivo +
+                  " (arquivo já existe no disco)")
 
     def delete_file(self, process, operation):
-        if process.prioridade != 0 and operation.Nome_arquivo not in process.created_files:
-            print("O processo não pode deletar o arquivo")
-            # TODO error message
-
-        self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))
+        if process.prioridade == 0 or operation.Nome_arquivo in process.created_files:
+            self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))
+            print("\tSucesso: O processo " + str(process.PID) + " deletou o arquivo " + operation.Nome_arquivo)
+        else:
+            print("\tFalha: O processo " + str(process.PID) + " não pode deletar o arquivo " + operation.Nome_arquivo)

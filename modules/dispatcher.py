@@ -23,6 +23,8 @@ class Dispatcher:
         time = 0
 
         while len(self.processManager.processes_to_start) != 0 or not self.queueManager.empty():
+            print("\n\n--- Tempo " + str(time) + " ---")
+
             for process in self.processManager.processes_to_start:
                 if process.tempo_de_inicializacao > time:
                     break
@@ -37,9 +39,13 @@ class Dispatcher:
             self.runningProcess = self.queueManager.get_next_running_process(self.runningProcess)
 
             if self.runningProcess is not None:
+                self.runningProcess.program_count += 1
+
+                self.runningProcess.print_instruction()
+
                 self.fileManager.run_op(self.runningProcess)
 
-                if self.runningProcess.tempo_de_processador == 0:
+                if self.runningProcess.cpu_time_ended():
                     self.memoryManager.free_memory(self.runningProcess)
                     self.queueManager.remove_process(self.runningProcess)
                     self.runningProcess = None
@@ -47,9 +53,3 @@ class Dispatcher:
             time += 1
 
         self.fileManager.print()
-
-    def print_file_system(self, operation, process):
-        print('Sistema de arquivos =>')
-        print('operacao ' + str(operation) + '=> ' + 'Falha')
-        print('O processo ' + str(process.PID) + ' executou com sucesso')
-        print('\n')

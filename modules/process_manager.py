@@ -16,18 +16,30 @@ class ProcessInfo:
         self.offset = -1
         self.PID = -1
         self.created_files = []
+        self.program_count = 0
 
     def print(self):
         print('dispatcher =>')
-        print('PID: ' + str(self.PID))
-        print('offset: ' + str(self.offset))
-        print('blocks: ' + str(self.blocos_em_memoria))
-        print('priority: ' + str(self.prioridade))
-        print('time: ' + str(self.tempo_de_processador))
-        print('printer: ' + str(self.numero_codigo_da_impresora_requisitada))
-        print('scanner: ' + str(self.requisicao_do_scanner))
-        print('modem: ' + str(self.requisicao_do_modem))
-        print('\n')
+        print('\tPID: ' + str(self.PID))
+        print('\toffset: ' + str(self.offset))
+        print('\tblocks: ' + str(self.blocos_em_memoria))
+        print('\tpriority: ' + str(self.prioridade))
+        print('\ttime: ' + str(self.tempo_de_processador))
+        print('\tprinter: ' + str(self.numero_codigo_da_impresora_requisitada))
+        print('\tscanner: ' + str(self.requisicao_do_scanner))
+        print('\tmodem: ' + str(self.requisicao_do_modem))
+        print()
+
+    def print_instruction(self):
+        print("Process " + str(self.PID) + " =>")
+        if self.program_count == 1:
+            print("\tSTARTED")
+        print("\tExecuted instruction " + str(self.program_count))
+        if self.cpu_time_ended():
+            print("\treturn SIGINT")
+
+    def cpu_time_ended(self):
+        return self.program_count == self.tempo_de_processador
 
 
 class ProcessManager:
