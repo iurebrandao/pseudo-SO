@@ -6,6 +6,7 @@ from modules import queue_manager as qm
 
 class Dispatcher:
     def __init__(self):
+        print('Iniciando o SO...')
         self.processManager = pm.ProcessManager()
         self.fileManager = fm.FileManager()
         self.memoryManager = mm.MemoryManager()
@@ -14,7 +15,6 @@ class Dispatcher:
         self.runningProcess = None
 
     def run(self):
-        print('Iniciando o SO...')
         # Ordenando os processos por odem de chegada
         self.processManager.processes_to_start.sort(key=lambda x: x.tempo_de_inicializacao)
 
@@ -51,5 +51,3 @@ class Dispatcher:
                     self.runningProcess = None
 
             time += 1
-
-        self.fileManager.print()

@@ -3,7 +3,7 @@ import sys
 class FileInfo:
     def __init__(self, info_line):
         line = info_line.split(',')
-        self.nome_arquivo = line[0]
+        self.nome_arquivo = line[0].strip()
         self.primeiro_bloco = int(line[1])
         self.n_blocos = int(line[2])
 
@@ -13,7 +13,7 @@ class FileOp:
         line = info_line.split(',')
         self.ID_Processo = int(line[0])
         self.Codigo_Operacao = int(line[1])
-        self.Nome_arquivo = line[2]
+        self.Nome_arquivo = line[2].strip()
         self.se_operacaoCriar_numero_blocos = int(line[3]) if len(line) == 4 else None
 
 
@@ -30,8 +30,10 @@ class FileManager:
         self.disk = [None] * self.n_blocos
         for file in self.files:
             self.disk[file.primeiro_bloco: file.primeiro_bloco + file.n_blocos] = [file.nome_arquivo] * file.n_blocos
+        self.print_disk()
 
-    def print(self):
+    def print_disk(self):
+        print("\tMapa do disco => | ", end='')
         for block in self.disk:
             nome = block if block is not None else '0'
             print(nome + ' | ', end='')
@@ -55,6 +57,8 @@ class FileManager:
                 self.delete_file(process, operation)
         else:
             print("\tNão foi encontrada nenhuma operação para o processo " + str(process.PID))
+
+        self.print_disk()
 
 
     def create_file(self, process, operation):
@@ -84,8 +88,12 @@ class FileManager:
                   " (arquivo já existe no disco)")
 
     def delete_file(self, process, operation):
-        if process.prioridade == 0 or operation.Nome_arquivo in process.created_files:
-            self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))
-            print("\tSucesso: O processo " + str(process.PID) + " deletou o arquivo " + operation.Nome_arquivo)
+        if operation.Nome_arquivo in self.disk:
+            if process.prioridade == 0 or operation.Nome_arquivo in process.created_files:
+                self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))
+                print("\tSucesso: O processo " + str(process.PID) + " deletou o arquivo " + operation.Nome_arquivo)
+            else:
+                print("\tFalha: O processo " + str(process.PID) + " não pode deletar o arquivo " + operation.Nome_arquivo)
         else:
-            print("\tFalha: O processo " + str(process.PID) + " não pode deletar o arquivo " + operation.Nome_arquivo)
+            print("\tFalha: O processo " + str(process.PID) + " não pode deletar o arquivo " + operation.Nome_arquivo +
+                  " (arquivo não existe)")
