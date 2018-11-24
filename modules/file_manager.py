@@ -42,7 +42,10 @@ class FileManager:
         for op in self.operations:
             if op.ID_Processo == process.PID:
                 operation = op
+                self.operations.remove(op)
                 break
+
+        print("Processo " + str(process.PID) + " op no arquivo " + str(operation.Nome_arquivo))
 
         if operation is not None:
             if operation.Codigo_Operacao == 0:
@@ -74,4 +77,4 @@ class FileManager:
             print("O processo não pode deletar o arquivo")
             # TODO error message
 
-        self.disk = map(lambda block: None if block == operation.Nome_arquivo else block, self.disk)
+        self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))

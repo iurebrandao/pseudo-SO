@@ -22,8 +22,7 @@ class Dispatcher:
         PID = 0
         time = 0
 
-        # while len(self.processManager.processes_to_start) == 0 and self.queueManager.empty():\
-        while True:
+        while len(self.processManager.processes_to_start) != 0 or not self.queueManager.empty():
             for process in self.processManager.processes_to_start:
                 if process.tempo_de_inicializacao > time:
                     break
