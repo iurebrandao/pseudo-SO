@@ -13,6 +13,7 @@ class ProcessInfo:
         self.requisicao_do_scanner = int(info[5])
         self.requisicao_do_modem = int(info[6])
         self.numero_codigo_do_disco = int(info[7])
+        self.alocado_em_espaco_usuario = False
 
 
 class ProcessManager:

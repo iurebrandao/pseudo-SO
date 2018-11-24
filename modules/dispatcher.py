@@ -1,5 +1,6 @@
 from modules import file_manager as fm
 from modules import process_manager as pm
+from modules import memory_manager as mm
 
 
 class Dispatcher:
