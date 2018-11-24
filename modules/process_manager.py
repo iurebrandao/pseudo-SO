@@ -17,6 +17,7 @@ class ProcessInfo:
         self.PID = -1
         self.created_files = []
         self.program_count = 0
+        self.current_quantum_used = 0
 
     def print(self):
         print('dispatcher =>')

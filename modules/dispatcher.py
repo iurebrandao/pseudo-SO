@@ -28,7 +28,7 @@ class Dispatcher:
             print("\n\n--- Tempo " + str(time) + " ---")
 
             for process in self.processManager.processes_to_start:
-                if process.tempo_de_inicializacao > time:
+                if process.tempo_de_inicializacao > time or self.queueManager.process_limit_reached():
                     break
 
                 io_get_result = self.ioManager.getIOdevice(process)
@@ -49,6 +49,7 @@ class Dispatcher:
 
             if self.runningProcess is not None:
                 self.runningProcess.program_count += 1
+                self.runningProcess.current_quantum_used += 1
 
                 self.runningProcess.print_instruction()
 

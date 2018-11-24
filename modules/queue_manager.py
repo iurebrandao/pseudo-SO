@@ -1,4 +1,7 @@
 
+QUANTUM = 1  # Instruction
+MAX_PROCESSES = 1000
+
 class QueueManager:
     def __init__(self):
         self.queueRealTime = []
@@ -17,18 +20,43 @@ class QueueManager:
             self.queueUserPriority3.append(process)
 
     def get_next_running_process(self, runningProcess):
-        if runningProcess is None:
+        if runningProcess and runningProcess.current_quantum_used == QUANTUM and runningProcess.prioridade != 0:
+            self.decrease_priority(runningProcess)
+            runningProcess = None
+
+        nextProcess = runningProcess
+
+        if nextProcess is None:
             if len(self.queueRealTime):
-                return self.queueRealTime[0]
+                nextProcess = self.queueRealTime[0]
+                nextProcess.current_quantum_used = 0
             if len(self.queueUserPriority1):
-                return self.queueUserPriority1[0]
+                nextProcess = self.queueUserPriority1[0]
+                nextProcess.current_quantum_used = 0
             if len(self.queueUserPriority2):
-                return self.queueUserPriority2[0]
+                nextProcess = self.queueUserPriority2[0]
+                nextProcess.current_quantum_used = 0
             if len(self.queueUserPriority3):
-                return self.queueUserPriority3[0]
-        else:
-            if runningProcess.prioridade == 0:
-                return runningProcess
+                nextProcess = self.queueUserPriority3[0]
+                nextProcess.current_quantum_used = 0
+
+        return nextProcess
+
+    def decrease_priority(self, process):
+        if process.prioridade == 1:
+            self.queueUserPriority1.remove(process)
+            process.prioridade = 2
+            self.queueUserPriority2.append(process)
+
+        elif process.prioridade == 2:
+            self.queueUserPriority2.remove(process)
+            process.prioridade = 3
+            self.queueUserPriority3.append(process)
+
+        elif process.prioridade == 3:
+            # The process already has the lowest priority
+            pass
+
 
     def remove_process(self, process):
         if process.prioridade == 0:
@@ -45,3 +73,9 @@ class QueueManager:
                len(self.queueUserPriority1) == 0 and\
                len(self.queueUserPriority2) == 0 and\
                len(self.queueUserPriority3) == 0
+
+    def process_limit_reached(self):
+        return MAX_PROCESSES < (len(self.queueRealTime) +
+                                len(self.queueUserPriority1) +
+                                len(self.queueUserPriority2) +
+                                len(self.queueUserPriority3))
