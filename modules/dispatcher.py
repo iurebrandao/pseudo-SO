@@ -1,12 +1,17 @@
 from modules import file_manager as fm
 from modules import process_manager as pm
 from modules import memory_manager as mm
+from modules import queue_manager as qm
 
 
 class Dispatcher:
     def __init__(self):
         self.processManager = pm.ProcessManager()
         self.fileManager = fm.FileManager()
+        self.memoryManager = mm.MemoryManager()
+        self.queueManager = qm.QueueManager()
+
+        self.runningProcess = None
 
     def run(self):
         print('Iniciando o SO...')
@@ -15,25 +20,34 @@ class Dispatcher:
 
         # Inicializando o PID para os processos
         PID = 0
-        for process in self.processManager.processes_to_start:
-            process.PID = PID
-            PID += 1
-            self.print_dispatcher(process)
-            operation = 0
-            self.print_file_system(operation, process)
+        time = 0
 
+        # while len(self.processManager.processes_to_start) == 0 and self.queueManager.empty():\
+        while True:
+            for process in self.processManager.processes_to_start:
+                if process.tempo_de_inicializacao > time:
+                    break
 
-    def print_dispatcher(self, process):
-        print('dispatcher =>')
-        print('PID: ' + str(process.PID))
-        print('offset: ')
-        print('blocks: ' + str(process.blocos_em_memoria))
-        print('priority: ' + str(process.prioridade))
-        print('time: ' + str(process.tempo_de_processador))
-        print('printer: ' + str(process.numero_codigo_da_impresora_requisitada))
-        print('scanner: ' + str(process.requisicao_do_scanner))
-        print('modem: ' + str(process.requisicao_do_modem))
-        print('\n')
+                if self.memoryManager.alloc_memory(process):
+                    self.processManager.processes_to_start.remove(process)
+                    process.PID = PID
+                    PID += 1
+                    self.queueManager.add_new_process(process)
+                    process.print()
+
+            self.runningProcess = self.queueManager.get_next_running_process(self.runningProcess)
+
+            if self.runningProcess is not None:
+                self.fileManager.run_op(self.runningProcess)
+
+                if self.runningProcess.tempo_de_processador == 0:
+                    self.memoryManager.free_memory(self.runningProcess)
+                    self.queueManager.remove_process(self.runningProcess)
+                    self.runningProcess = None
+
+            time += 1
+
+        self.fileManager.print()
 
     def print_file_system(self, operation, process):
         print('Sistema de arquivos =>')
