@@ -16,7 +16,7 @@ class Dispatcher:
     def run(self):
         print('Iniciando o SO...')
         # Ordenando os processos por odem de chegada
-        self.processManager.processes_to_start.sort(key=lambda x: x.tempo_de_inicializacao, reverse=True)
+        self.processManager.processes_to_start.sort(key=lambda x: x.tempo_de_inicializacao)
 
         # Inicializando o PID para os processos
         PID = 0
