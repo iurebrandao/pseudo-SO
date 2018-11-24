@@ -2,6 +2,7 @@ from modules import file_manager as fm
 from modules import process_manager as pm
 from modules import memory_manager as mm
 from modules import queue_manager as qm
+from modules import io_manager as im
 
 
 class Dispatcher:
@@ -11,6 +12,7 @@ class Dispatcher:
         self.fileManager = fm.FileManager()
         self.memoryManager = mm.MemoryManager()
         self.queueManager = qm.QueueManager()
+        self.ioManager = im.IoManager()
 
         self.runningProcess = None
 
@@ -29,12 +31,19 @@ class Dispatcher:
                 if process.tempo_de_inicializacao > time:
                     break
 
-                if self.memoryManager.alloc_memory(process):
+                io_get_result = self.ioManager.getIOdevice(process)
+                if not io_get_result:
+                    continue
+
+                memory_alloc_result = self.memoryManager.alloc_memory(process)
+                if memory_alloc_result:
                     self.processManager.processes_to_start.remove(process)
                     process.PID = PID
                     PID += 1
                     self.queueManager.add_new_process(process)
                     process.print()
+                else:
+                    self.ioManager.releaseIOdevice(process)
 
             self.runningProcess = self.queueManager.get_next_running_process(self.runningProcess)
 
@@ -48,6 +57,7 @@ class Dispatcher:
                 if self.runningProcess.cpu_time_ended():
                     self.memoryManager.free_memory(self.runningProcess)
                     self.queueManager.remove_process(self.runningProcess)
+                    self.ioManager.releaseIOdevice(process)
                     self.runningProcess = None
 
             time += 1
