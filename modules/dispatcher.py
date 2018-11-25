@@ -58,7 +58,7 @@ class Dispatcher:
                 if self.runningProcess.cpu_time_ended():
                     self.memoryManager.free_memory(self.runningProcess)
                     self.queueManager.remove_process(self.runningProcess)
-                    self.ioManager.releaseIOdevice(process)
+                    self.ioManager.releaseIOdevice(self.runningProcess)
                     self.runningProcess = None
 
             time += 1
