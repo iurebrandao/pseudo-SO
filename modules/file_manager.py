@@ -23,7 +23,7 @@ class FileManager:
             lines = f.read().splitlines()
             self.n_blocos = int(lines[0])
             self.n_segmentos = int(lines[1])
-            self.files = [FileInfo(line) for line in lines[2 : self.n_segmentos + 2]]
+            self.files = [FileInfo(line) for line in lines[2: self.n_segmentos + 2]]
             self.operations = [FileOp(line) for line in lines[self.n_segmentos + 2:]]
 
         # Write initial files to disk
@@ -53,13 +53,14 @@ class FileManager:
         if operation is not None:
             if operation.Codigo_Operacao == 0:
                 self.create_file(process, operation)
-            else:
+            elif operation.Codigo_Operacao == 1:
                 self.delete_file(process, operation)
+            else:
+                print("\tFalha: Operação desconhecida")
         else:
             print("\tNão foi encontrada nenhuma operação para o processo " + str(process.PID))
 
         self.print_disk()
-
 
     def create_file(self, process, operation):
         first_bock_fit = None
@@ -72,11 +73,14 @@ class FileManager:
                     first_bock_fit = i
 
             if first_bock_fit is not None:
+                # Write the file to the disk
                 self.disk[first_bock_fit: first_bock_fit + operation.se_operacaoCriar_numero_blocos] =\
                     [operation.Nome_arquivo] * operation.se_operacaoCriar_numero_blocos
 
+                # Stores the information that the file belongs to the current process
                 process.created_files.append(operation.Nome_arquivo)
 
+                # Print the details of the new file
                 blocks_str = ', '.join(str(x) for x in list(range(first_bock_fit, first_bock_fit + operation.se_operacaoCriar_numero_blocos)))
                 print("\tSucesso: O processo " + str(process.PID) + " criou o arquivo " + operation.Nome_arquivo +
                       " (blocos " + blocks_str + ")")
@@ -88,7 +92,9 @@ class FileManager:
                   " (arquivo já existe no disco)")
 
     def delete_file(self, process, operation):
+        # Check if file exists
         if operation.Nome_arquivo in self.disk:
+            # Check if the process has permission to delete tha file
             if process.prioridade == 0 or operation.Nome_arquivo in process.created_files:
                 self.disk = list(map(lambda block: None if block == operation.Nome_arquivo else block, self.disk))
                 print("\tSucesso: O processo " + str(process.PID) + " deletou o arquivo " + operation.Nome_arquivo)

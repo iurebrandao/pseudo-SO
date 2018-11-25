@@ -9,14 +9,17 @@ class IoManager:
         self.modem_used_by = -1
 
     def getIOdevice(self, process):
+        # Check if there isn't another process already using the required device
         if (process.numero_codigo_da_impresora_requisitada == 1 and self.printer_1_used_by != -1) or\
-            (process.numero_codigo_da_impresora_requisitada == 2 and self.printer_2_used_by != -1) or\
-            (process.numero_codigo_do_disco == 1 and self.disk_1_used_by != -1) or\
-            (process.numero_codigo_do_disco == 2 and self.disk_2_used_by != -1) or\
-            (process.requisicao_do_scanner == 1 and self.scanner_used_by != -1) or\
-            (process.requisicao_do_modem == 1 and self.modem_used_by != -1):
+                (process.numero_codigo_da_impresora_requisitada == 2 and self.printer_2_used_by != -1) or\
+                (process.numero_codigo_do_disco == 1 and self.disk_1_used_by != -1) or\
+                (process.numero_codigo_do_disco == 2 and self.disk_2_used_by != -1) or\
+                (process.requisicao_do_scanner == 1 and self.scanner_used_by != -1) or\
+                (process.requisicao_do_modem == 1 and self.modem_used_by != -1):
+            print("IO => Não foi possível alocar um dos recursos de IO necessário")
             return False
 
+        # Allocates the required device to the process
         if process.numero_codigo_da_impresora_requisitada == 1:
             self.printer_1_used_by = process.PID
 

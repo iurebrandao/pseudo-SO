@@ -20,6 +20,7 @@ class QueueManager:
             self.queueUserPriority3.append(process)
 
     def get_next_running_process(self, runningProcess):
+        # If the process has used all it's quantum the process is interrupted and its priority decreases
         if runningProcess and runningProcess.current_quantum_used == QUANTUM and runningProcess.prioridade != 0:
             self.decrease_priority(runningProcess)
             runningProcess = None
@@ -56,7 +57,6 @@ class QueueManager:
         elif process.prioridade == 3:
             # The process already has the lowest priority
             pass
-
 
     def remove_process(self, process):
         if process.prioridade == 0:
