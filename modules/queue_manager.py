@@ -1,5 +1,5 @@
 
-QUANTUM = 1  # Instruction
+QUANTUM = 1  # Instructions
 MAX_PROCESSES = 1000
 
 class QueueManager:

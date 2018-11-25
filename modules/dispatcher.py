@@ -4,6 +4,7 @@ from modules import memory_manager as mm
 from modules import queue_manager as qm
 from modules import io_manager as im
 
+QUANTUM = 1  # Instruction
 
 class Dispatcher:
     def __init__(self):
@@ -48,14 +49,16 @@ class Dispatcher:
 
                     # Aciona o processo na fila de processos prontos de acordo com sua prioridade
                     self.queueManager.add_new_process(process)
-
-                    # Imprime as informaçoes do novo processo
-                    process.print()
                 else:
                     self.ioManager.releaseIOdevice(process)
 
             # Encontra qual o próximo processo que irá executar de acordo com as regras de prioridade e de preempção
-            self.runningProcess = self.queueManager.get_next_running_process(self.runningProcess)
+            next_running_process = self.queueManager.get_next_running_process(self.runningProcess)
+            if next_running_process != self.runningProcess and next_running_process is not None:
+                # Ocorre troca de contexto
+                self.runningProcess = next_running_process
+                print('dispatcher =>')
+                self.runningProcess.print()
 
             if self.runningProcess is not None:
                 if not self.runningProcess.cpu_time_ended():

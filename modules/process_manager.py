@@ -20,7 +20,6 @@ class ProcessInfo:
         self.current_quantum_used = 0
 
     def print(self):
-        print('dispatcher =>')
         print('\tPID: ' + str(self.PID))
         print('\toffset: ' + str(self.offset))
         print('\tblocks: ' + str(self.blocos_em_memoria))
