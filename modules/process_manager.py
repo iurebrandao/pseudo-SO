@@ -29,6 +29,7 @@ class ProcessInfo:
         print('\tprinter: ' + str(self.numero_codigo_da_impresora_requisitada))
         print('\tscanner: ' + str(self.requisicao_do_scanner))
         print('\tmodem: ' + str(self.requisicao_do_modem))
+        print('\tdisco: ' + str(self.numero_codigo_do_disco))
         print()
 
     def print_instruction(self):

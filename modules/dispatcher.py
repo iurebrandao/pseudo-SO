@@ -25,15 +25,15 @@ class Dispatcher:
         time = 0
 
         while len(self.processManager.processes_to_start) != 0 or not self.queueManager.empty():
-            print("\n\n--- Tempo " + str(time) + " ---")
+            print("\n\n\n\n--- Tempo " + str(time) + " ---")
 
             # Verifica se chegaram novos processos
-            for process in self.processManager.processes_to_start:
+            for process in self.processManager.processes_to_start.copy():
                 if process.tempo_de_inicializacao > time or self.queueManager.process_limit_reached():
                     break
 
                 # Tenta alocar os recursos de IO requisitados pelo processo
-                io_get_result = self.ioManager.getIOdevice(process)
+                io_get_result = self.ioManager.getIOdevice(process, PID)
                 if not io_get_result:
                     continue
 
@@ -58,13 +58,14 @@ class Dispatcher:
             self.runningProcess = self.queueManager.get_next_running_process(self.runningProcess)
 
             if self.runningProcess is not None:
-                self.runningProcess.program_count += 1
-                self.runningProcess.current_quantum_used += 1
+                if not self.runningProcess.cpu_time_ended():
+                    self.runningProcess.program_count += 1
+                    self.runningProcess.current_quantum_used += 1
 
-                self.runningProcess.print_instruction()
+                    self.runningProcess.print_instruction()
 
-                # Executa a operação no sistema de arquivos
-                self.fileManager.run_op(self.runningProcess)
+                    # Executa a operação no sistema de arquivos
+                    self.fileManager.run_op(self.runningProcess)
 
                 # Encerra o processo quando seu tempo total de CPU foi utilizado
                 if self.runningProcess.cpu_time_ended():

@@ -31,13 +31,13 @@ class QueueManager:
             if len(self.queueRealTime):
                 nextProcess = self.queueRealTime[0]
                 nextProcess.current_quantum_used = 0
-            if len(self.queueUserPriority1):
+            elif len(self.queueUserPriority1):
                 nextProcess = self.queueUserPriority1[0]
                 nextProcess.current_quantum_used = 0
-            if len(self.queueUserPriority2):
+            elif len(self.queueUserPriority2):
                 nextProcess = self.queueUserPriority2[0]
                 nextProcess.current_quantum_used = 0
-            if len(self.queueUserPriority3):
+            elif len(self.queueUserPriority3):
                 nextProcess = self.queueUserPriority3[0]
                 nextProcess.current_quantum_used = 0
 
@@ -55,8 +55,9 @@ class QueueManager:
             self.queueUserPriority3.append(process)
 
         elif process.prioridade == 3:
-            # The process already has the lowest priority
-            pass
+            # The process already has the lowest priority, so just move the process to the end of the queue
+            self.queueUserPriority3.remove(process)
+            self.queueUserPriority3.append(process)
 
     def remove_process(self, process):
         if process.prioridade == 0:
@@ -75,7 +76,7 @@ class QueueManager:
                len(self.queueUserPriority3) == 0
 
     def process_limit_reached(self):
-        return MAX_PROCESSES < (len(self.queueRealTime) +
-                                len(self.queueUserPriority1) +
-                                len(self.queueUserPriority2) +
-                                len(self.queueUserPriority3))
+        return MAX_PROCESSES <= (len(self.queueRealTime) +
+                                 len(self.queueUserPriority1) +
+                                 len(self.queueUserPriority2) +
+                                 len(self.queueUserPriority3))

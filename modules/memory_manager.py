@@ -14,9 +14,9 @@ class MemoryManager:
         if process.prioridade != 0:
             memory_start = SIZE_REAL_TIME_MEMORY
 
-        for i in range(memory_start, len(self.memory) - process.blocos_em_memoria):
-            if sum(self.memory[i: process.blocos_em_memoria]) == 0:
-                self.memory[i: process.blocos_em_memoria] = [1] * process.blocos_em_memoria
+        for i in range(memory_start, len(self.memory) - process.blocos_em_memoria + 1):
+            if sum(self.memory[i: i + process.blocos_em_memoria]) == 0:
+                self.memory[i: i + process.blocos_em_memoria] = [1] * process.blocos_em_memoria
                 process.offset = i
                 return True
 
